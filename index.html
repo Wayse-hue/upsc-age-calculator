@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UPSC & APSC Age Calculator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a0ca3;
+            --secondary: #3f37c9;
+            --accent: #4cc9f0;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #4caf50;
+            --warning: #ff9800;
+            --error: #f44336;
+            --text-light: #f8f9fa;
+            --text-dark: #212529;
+            --card-bg: #ffffff;
+            --card-shadow: rgba(0, 0, 0, 0.1);
+            --input-bg: #ffffff;
+            --input-border: #ced4da;
+        }
+
+        .dark-mode {
+            --light: #121212;
+            --dark: #f8f9fa;
+            --card-bg: #1e1e1e;
+            --card-shadow: rgba(0, 0, 0, 0.3);
+            --input-bg: #2d2d2d;
+            --input-border: #444;
+            --text-light: #212529;
+            --text-dark: #f8f9fa;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body {
+            background-color: var(--light);
+            color: var(--dark);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--dark);
+            opacity: 0.8;
+        }
+
+        .theme-toggle {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--dark);
+        }
+
+        .calculator-card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 20px var(--card-shadow);
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        select, input[type="date"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--input-border);
+            border-radius: 6px;
+            font-size: 1rem;
+            background-color: var(--input-bg);
+            color: var(--dark);
+        }
+
+        select:focus, input[type="date"]:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.2);
+        }
+
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .result-card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 20px var(--card-shadow);
+        }
+
+        .result-item {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .result-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .result-label {
+            font-size: 0.9rem;
+            color: var(--dark);
+            opacity: 0.8;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .result-value {
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+
+        .eligibility {
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 20px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .eligible {
+            background-color: rgba(76, 175, 80, 0.2);
+            color: var(--success);
+        }
+
+        .not-eligible {
+            background-color: rgba(244, 67, 54, 0.2);
+            color: var(--error);
+        }
+
+        .attempts-left {
+            background-color: rgba(255, 152, 0, 0.2);
+            color: var(--warning);
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .error {
+            color: var(--error);
+            font-size: 0.9rem;
+            margin-top: 5px;
+            display: none;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            color: var(--dark);
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .theme-toggle {
+                position: relative;
+                margin-top: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>UPSC & APSC Age Calculator</h1>
+            <p class="subtitle">Check your eligibility and remaining attempts for civil services exams</p>
+            <button class="theme-toggle" id="themeToggle">
+                <i class="fas fa-moon"></i>
+            </button>
+        </header>
+
+        <div class="calculator-card">
+            <div class="form-group">
+                <label for="examType">Select Exam</label>
+                <select id="examType">
+                    <option value="">-- Select Exam --</option>
+                    <option value="upsc">UPSC Civil Services</option>
+                    <option value="apsc">APSC Combined Competitive Exam</option>
+                </select>
+                <div class="error" id="examError">Please select an exam type</div>
+            </div>
+
+            <div class="form-group">
+                <label for="category">Select Category</label>
+                <select id="category">
+                    <option value="">-- Select Category --</option>
+                    <option value="general">General</option>
+                    <option value="obc">OBC</option>
+                    <option value="scst">SC/ST</option>
+                    <option value="pwbd">PwBD</option>
+                </select>
+                <div class="error" id="categoryError">Please select your category</div>
+            </div>
+
+            <div class="form-group">
+                <label for="dob">Date of Birth</label>
+                <input type="date" id="dob" max="">
+                <div class="error" id="dobError">Please enter a valid date of birth</div>
+            </div>
+
+            <button id="calculateBtn">Calculate Eligibility</button>
+        </div>
+
+        <div class="result-card" id="resultCard" style="display: none;">
+            <div class="result-item">
+                <div class="result-label">Your Current Age</div>
+                <div class="result-value" id="currentAge">--</div>
+            </div>
+            
+            <div class="result-item">
+                <div class="result-label">Exam</div>
+                <div class="result-value" id="examName">--</div>
+            </div>
+            
+            <div class="result-item">
+                <div class="result-label">Category</div>
+                <div class="result-value" id="categoryName">--</div>
+            </div>
+            
+            <div class="result-item">
+                <div class="result-label">Maximum Age Limit</div>
+                <div class="result-value" id="maxAge">--</div>
+            </div>
+            
+            <div id="eligibilityResult" class="eligibility">
+                Eligibility status will appear here
+            </div>
+            
+            <div id="attemptsLeft" class="attempts-left">
+                Attempts remaining will appear here
+            </div>
+        </div>
+
+        <footer>
+            <p>Note: Age limits are as per official notifications. Always verify with current year's exam notification.</p>
+            <p>&copy; <span id="currentYear"></span> UPSC & APSC Age Calculator</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set current year in footer
+            document.getElementById('currentYear').textContent = new Date().getFullYear();
+            
+            // Set max date to today for date input
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('dob').setAttribute('max', today);
+            
+            // Theme toggle functionality
+            const themeToggle = document.getElementById('themeToggle');
+            themeToggle.addEventListener('click', function() {
+                document.body.classList.toggle('dark-mode');
+                if (document.body.classList.contains('dark-mode')) {
+                    themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+                } else {
+                    themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+                }
+            });
+            
+            // Calculate eligibility when button is clicked
+            document.getElementById('calculateBtn').addEventListener('click', calculateEligibility);
+            
+            function calculateEligibility() {
+                // Get input values
+                const examType = document.getElementById('examType').value;
+                const category = document.getElementById('category').value;
+                const dobInput = document.getElementById('dob').value;
+                
+                // Reset errors
+                document.getElementById('examError').style.display = 'none';
+                document.getElementById('categoryError').style.display = 'none';
+                document.getElementById('dobError').style.display = 'none';
+                
+                // Validate inputs
+                let isValid = true;
+                if (!examType) {
+                    document.getElementById('examError').style.display = 'block';
+                    isValid = false;
+                }
+                if (!category) {
+                    document.getElementById('categoryError').style.display = 'block';
+                    isValid = false;
+                }
+                if (!dobInput) {
+                    document.getElementById('dobError').style.display = 'block';
+                    isValid = false;
+                }
+                
+                if (!isValid) return;
+                
+                // Calculate age
+                const birthDate = new Date(dobInput);
+                const today = new Date();
+                
+                let ageYears = today.getFullYear() - birthDate.getFullYear();
+                let ageMonths = today.getMonth() - birthDate.getMonth();
+                let ageDays = today.getDate() - birthDate.getDate();
+                
+                // Adjust for negative months or days
+                if (ageMonths < 0 || (ageMonths === 0 && ageDays < 0)) {
+                    ageYears--;
+                    ageMonths += 12;
+                }
+                
+                if (ageDays < 0) {
+                    const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, birthDate.getDate());
+                    ageDays = Math.floor((today - lastMonth) / (1000 * 60 * 60 * 24));
+                    ageMonths--;
+                }
+                
+                // Calculate age as of January 1 of exam year (for APSC)
+                const currentYear = today.getFullYear();
+                const jan1ThisYear = new Date(currentYear, 0, 1);
+                const jan1NextYear = new Date(currentYear + 1, 0, 1);
+                
+                let ageAsOfJan1 = currentYear - birthDate.getFullYear();
+                if (birthDate > jan1ThisYear) {
+                    ageAsOfJan1--;
+                }
+                
+                let ageAsOfNextJan1 = (currentYear + 1) - birthDate.getFullYear();
+                if (birthDate > jan1NextYear) {
+                    ageAsOfNextJan1--;
+                }
+                
+                // Get maximum age limits
+                let maxAge = 0;
+                let examName = '';
+                let categoryName = '';
+                
+                if (examType === 'upsc') {
+                    examName = 'UPSC Civil Services';
+                    
+                    switch(category) {
+                        case 'general':
+                            maxAge = 32;
+                            categoryName = 'General';
+                            break;
+                        case 'obc':
+                            maxAge = 35;
+                            categoryName = 'OBC';
+                            break;
+                        case 'scst':
+                            maxAge = 37;
+                            categoryName = 'SC/ST';
+                            break;
+                        case 'pwbd':
+                            maxAge = 42;
+                            categoryName = 'PwBD';
+                            break;
+                    }
+                    
+                    // For UPSC, use current age
+                    var ageForEligibility = ageYears;
+                } else { // APSC
+                    examName = 'APSC CCE';
+                    
+                    switch(category) {
+                        case 'general':
+                            maxAge = 38;
+                            categoryName = 'General';
+                            break;
+                        case 'obc':
+                            maxAge = 41;
+                            categoryName = 'OBC/MOBC';
+                            break;
+                        case 'scst':
+                            maxAge = 43;
+                            categoryName = 'SC/ST';
+                            break;
+                        case 'pwbd':
+                            maxAge = 48;
+                            categoryName = 'PwBD';
+                            break;
+                    }
+                    
+                    // For APSC, use age as of Jan 1 of exam year
+                    var ageForEligibility = ageAsOfNextJan1;
+                }
+                
+                // Determine eligibility
+                const isEligible = ageForEligibility <= maxAge;
+                const yearsLeft = Math.max(0, maxAge - ageForEligibility);
+                const attemptsLeft = Math.floor(yearsLeft);
+                
+                // Display results
+                document.getElementById('currentAge').textContent = 
+                    `${ageYears} years, ${ageMonths} months, ${ageDays} days`;
+                document.getElementById('examName').textContent = examName;
+                document.getElementById('categoryName').textContent = categoryName;
+                document.getElementById('maxAge').textContent = `${maxAge} years`;
+                
+                const eligibilityResult = document.getElementById('eligibilityResult');
+                if (isEligible) {
+                    eligibilityResult.className = 'eligibility eligible';
+                    eligibilityResult.innerHTML = `
+                        <i class="fas fa-check-circle"></i> You are <strong>ELIGIBLE</strong> to apply!
+                        <p class="small">Your age (${ageForEligibility} years) is within the limit of ${maxAge} years</p>
+                    `;
+                } else {
+                    eligibilityResult.className = 'eligibility not-eligible';
+                    eligibilityResult.innerHTML = `
+                        <i class="fas fa-times-circle"></i> You are <strong>NOT ELIGIBLE</strong> to apply
+                        <p class="small">Your age (${ageForEligibility} years) exceeds the limit of ${maxAge} years</p>
+                    `;
+                }
+                
+                const attemptsLeftDiv = document.getElementById('attemptsLeft');
+                if (isEligible) {
+                    if (yearsLeft > 0) {
+                        attemptsLeftDiv.innerHTML = `
+                            <i class="fas fa-clock"></i> You have <strong>${attemptsLeft} ${attemptsLeft === 1 ? 'year' : 'years'}</strong> 
+                            (${attemptsLeft} ${attemptsLeft === 1 ? 'attempt' : 'attempts'}) remaining
+                        `;
+                    } else {
+                        attemptsLeftDiv.innerHTML = `
+                            <i class="fas fa-exclamation-triangle"></i> This is your last eligible year to apply!
+                        `;
+                    }
+                } else {
+                    attemptsLeftDiv.innerHTML = `
+                        <i class="fas fa-ban"></i> You have no attempts remaining as you've crossed the age limit
+                    `;
+                }
+                
+                // Show results card
+                document.getElementById('resultCard').style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
